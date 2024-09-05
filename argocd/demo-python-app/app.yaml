@@ -1,0 +1,42 @@
+apiVersion: argoproj.io/v1alpha1
+kind: ApplicationSet
+metadata:
+  name: helm-applications
+  namespace: argocd
+  finalizers:
+    - resources-finalizer.argocd.argoproj.io
+spec:
+  generators:
+    - list:
+        elements:
+          - name: apple-dev
+            valuesFile: https://raw.githubusercontent.com/shahGnp/webapp-values/main/dev-values.yaml
+            namespace: apple-dev
+          - name: apple-prod
+            valuesFile: https://raw.githubusercontent.com/shahGnp/webapp-values/main/prod-values.yaml
+            namespace: apple-prod
+          - name: apple-stage
+            valuesFile: https://raw.githubusercontent.com/shahGnp/webapp-values/main/stage-values.yaml
+            namespace: apple-stage  # Corrected the typo here
+  template:
+    metadata:
+      name: '{{name}}'
+    spec:
+      project: default
+      sources:
+        - repoURL: https://github.com/shahgnp/webapp.git
+          path: .  # Ensure this path is correct
+          targetRevision: HEAD
+          helm:
+            valueFiles:
+              -   '{{ valuesFile }}'
+
+      destination:
+        server: https://kubernetes.default.svc
+        namespace: '{{namespace}}'
+      syncPolicy:
+        automated:
+          prune: true
+          selfHeal: true
+        syncOptions:
+          - CreateNamespace=true
