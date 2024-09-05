@@ -15,7 +15,7 @@ spec:
     path: .
     repoURL: 'https://github.com/shahGnp/helm_demo-python-app'
     targetRevision: HEAD
-  project: default
+  project: demo-python-app
   syncPolicy:
     automated:
       prune: true
