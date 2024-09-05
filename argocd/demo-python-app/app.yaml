@@ -3,6 +3,8 @@ kind: Application
 metadata:
   name: demo-python-app
   namespace: argocd
+  finalizers:
+    - resources-finalizer.argocd.argoproj.io
   annotations:
     argocd-image-updater.argoproj.io/image-list: docker.io/shahgnp/demo-python-app:*
 spec:
