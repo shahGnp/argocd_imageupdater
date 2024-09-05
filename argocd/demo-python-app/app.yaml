@@ -1,42 +1,22 @@
 apiVersion: argoproj.io/v1alpha1
-kind: ApplicationSet
+kind: Application
 metadata:
-  name: helm-applications
+  name: demo-python-app
   namespace: argocd
-  finalizers:
-    - resources-finalizer.argocd.argoproj.io
+  annotations:
+    argocd-image-updater.argoproj.io/image-list: docker.io/shahgnp/demo-python-app:*
 spec:
-  generators:
-    - list:
-        elements:
-          - name: apple-dev
-            valuesFile: https://raw.githubusercontent.com/shahGnp/webapp-values/main/dev-values.yaml
-            namespace: apple-dev
-          - name: apple-prod
-            valuesFile: https://raw.githubusercontent.com/shahGnp/webapp-values/main/prod-values.yaml
-            namespace: apple-prod
-          - name: apple-stage
-            valuesFile: https://raw.githubusercontent.com/shahGnp/webapp-values/main/stage-values.yaml
-            namespace: apple-stage  # Corrected the typo here
-  template:
-    metadata:
-      name: '{{name}}'
-    spec:
-      project: default
-      sources:
-        - repoURL: https://github.com/shahgnp/webapp.git
-          path: .  # Ensure this path is correct
-          targetRevision: HEAD
-          helm:
-            valueFiles:
-              -   '{{ valuesFile }}'
-
-      destination:
-        server: https://kubernetes.default.svc
-        namespace: '{{namespace}}'
-      syncPolicy:
-        automated:
-          prune: true
-          selfHeal: true
-        syncOptions:
-          - CreateNamespace=true
+  destination:
+    namespace: demo-python-app
+    server: 'https://kubernetes.default.svc'
+  source:
+    path: .
+    repoURL: 'https://github.com/shahGnp/helm_demo-python-app'
+    targetRevision: HEAD
+  project: default
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
